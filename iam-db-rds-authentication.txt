@@ -1,0 +1,188 @@
+iam policy---->policy1
+----------------------------specific db user--------------------------------------------------
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"rds-db:connect"
+			],
+			"Resource": [
+				"arn:aws:rds-db:us-east-1:291222035571:dbuser:db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E/user1"
+			]
+		}
+	]
+}
+------------------------ allows access to two different database users in a DB instance.-----------------------------------------
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Action": [
+             "rds-db:connect"
+         ],
+         "Resource": [
+             "arn:aws:rds-db:us-east-1:291222035571:dbuser:db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E/user1",
+             "arn:aws:rds-db:us-east-1:291222035571:dbuser:db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E/user2"
+         ]
+      }
+   ]
+}
+----------------- "*" character to match all DB instances and database accounts for a particular AWS account and AWS Region.----------------------
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds-db:us-east-1:291222035571:dbuser:*/*"
+            ]
+        }
+    ]
+}
+------------------------------only grants access to DB instances that have a ecomuser1 database account--------------------------------
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Action": [
+             "rds-db:connect"
+         ],
+         "Resource": [
+             "arn:aws:rds-db:us-east-1:291222035571:dbuser:*/user1"
+         ]
+      }
+   ]
+}
+------------------------------------------------------------------------------------------------------------
+
+
+
+role---->role1----->attach policy1
+
+or
+
+iam user---->user1, user2, user3---->attach policy1   (user1 is db user )
+
+If you attach the policy to user1, user2, and user3, then each of those users 
+can connect to the specified DB instance using the user1 database account.  <---must match user1 a/c with db user user1.
+
+$aws rds describe-db-instances --query "DBInstances[*].[DBInstanceIdentifier,DbiResourceId]"
+
+
+db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E  
+
+If you are using Amazon Aurora, specify a DbClusterResourceId instead of a DbiResourceId.
+------------------------------------------------------------------------------------------------------------------
+If you are connecting to a database through RDS Proxy, specify the proxy resource ID, such as prx-ABCDEFGHIJKL01234
+------------------------------------------------------------------------------------------------------------------
+With IAM database authentication, you don't need to assign database passwords to the user accounts you create.
+If you remove a user that is mapped to a database account, you should also remove the database account with the DROP USER statement.
+
+
+NOTE:
+The user name used for IAM authentication must match the case of the user name in the database.<----IMPORTANAT
+------------------------------------------------------------------------------------------------------------------
+With MariaDB and MySQL, authentication is handled by AWSAuthenticationPlugin—an AWS-provided plugin that
+works seamlessly with IAM to authenticate your users. 
+
+Connect to the DB instance as the master user or a different user who can create users and grant privileges.
+
+
+$ mysql -h <> -u admin -p admin123 ecomdb
+mysql(ecomdb)> CREATE USER user1 IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS'; 
+
+
+--------------------------user1 in iam policy & user1 in db create user with awsauthplugin-----------------------------
+The IDENTIFIED WITH clause allows MariaDB and MySQL to use the AWSAuthenticationPlugin to authenticate the database account (user1). 
+
+The AS 'RDS' clause refers to the authentication method.
+
+Make sure the specified database user name is the same as a resource in the IAM policy for IAM database access.
+----------------------------------------------------------------------------------------------------------------------
+With IAM database authentication, you use an authentication token when you connect to your DB instance. 
+
+An authentication token is a string of characters that you use instead of a password.
+
+After you generate an authentication token, it's valid for 15 minutes before it expires. 
+
+If you try to connect using an expired token, the connection request is denied.
+
+Every authentication token must be accompanied by a valid signature, using AWS signature version 4.
+
+---------------------------------lambda access rds with iamrdsdbauth-------------------------------------------------------
+You can use an authentication token when you connect to Amazon RDS from another AWS service, such as AWS Lambda. <--------
+
+By using a token, you can avoid placing a password in your code.
+
+Alternatively, you can use an AWS SDK to programmatically create and programmatically sign an authentication token.
+---------------------------------------------------------------------------------------------------------------------
+wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
+
+RDSHOST="mysqldb.123456789012.us-east-1.rds.amazonaws.com"
+TOKEN="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 3306 --region us-east-1 --username user1 )"
+
+mysql --host=$RDSHOST --port=3306 --ssl-ca=global-bundle.pem --enable-cleartext-plugin --user=user1 --password=$TOKEN
+
+mysql> show status like 'Ssl%';
++---------------+-------------+
+| Variable_name | Value                                                                                                                                                                                                                                |
++---------------+-------------+
+| ...           | ...
+| Ssl_cipher    | AES256-SHA                                                                                                                                                                                                                           |
+| ...           | ...
+| Ssl_version   | TLSv1.1                                                                                                                                                                                                                              |
+| ...           | ...
++-----------------------------+
+
+
+----------------------------------------------------------------------------------------------------------------
+Certificate bundles for specific AWS Regions
+To get a certificate bundle that contains both the intermediate and root certificates for an AWS Region,
+download it from the link for the AWS Region in the following table.
+
+US East (N. Virginia)     
+pem:  https://truststore.pki.rds.amazonaws.com/us-east-1/us-east-1-bundle.pem
+p7b: https://truststore.pki.rds.amazonaws.com/us-east-1/us-east-1-bundle.p7b
+---------------------Connecting using IAM authentication and the AWS SDK for Python (Boto3)--------------------
+$wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+ssl_ca='./global-bundle.pem'
+$ python3 -m pip install PyMySQL
+
+
+----------------------------------------------------------------------------------
+import pymysql
+import sys
+import boto3
+import os
+
+ENDPOINT="mysqldb.123456789012.us-east-1.rds.amazonaws.com"
+PORT="3306"
+USER="user1"
+REGION="us-east-1"
+DBNAME="ecomdb"
+os.environ['LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN'] = '1'
+
+#gets the credentials from .aws/credentials
+session = boto3.Session(profile_name='default')
+client = session.client('rds')
+
+token = client.generate_db_auth_token(DBHostname=ENDPOINT, Port=PORT, DBUsername=USER, Region=REGION)
+
+try:
+    conn =  pymysql.connect(host=ENDPOINT, user=USER, passwd=token, port=PORT, database=DBNAME, ssl_ca='./global-bundle.pem')
+    cur = conn.cursor()
+    cur.execute("""SELECT now()""")
+    query_results = cur.fetchall()
+    print(query_results)
+except Exception as e:
+    print("Database connection failed due to {}".format(e))          
+-----------------------------------------------------------------------------------------------------------------------
+
