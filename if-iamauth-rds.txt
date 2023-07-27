@@ -1,0 +1,63 @@
+[ec2-user@ip-172-31-4-143 html]$ mysql -u admin -padmin123 ecomdb
+mysql> CREATE USER user1 IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> exit
+Bye
+
+
+
+[ec2-user@ip-172-31-4-143 html]$ RDSHOST="ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com"
+[ec2-user@ip-172-31-4-143 html]$ TOKEN="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 3306 --region us-east-1 --username user1 )"
+[ec2-user@ip-172-31-4-143 html]$ 
+[ec2-user@ip-172-31-4-143 html]$ mysql --host=$RDSHOST --port=3306 --ssl-ca=global-bundle.pem --enable-cleartext-plugin --user=user1 --password=$TOKEN
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 45
+Server version: 8.0.33 Source distribution
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+  ---------------------------------------------------------------rds proxy-------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[ec2-user@ip-172-31-4-143 html]$ mysql -h proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com -uecomuser  -pecompassword --enable-cleartext-plugin --ssl-ca=AmazonRootCA1.pem  --ssl-mode=VERIFY_CA 
+
+$wget https://www.amazontrust.com/repository/AmazonRootCA1.pem
+
+  
+PREFERRED
+SSL is the first choice, but it isn't required.
+
+DISABLED
+No SSL is allowed.
+
+REQUIRED
+Enforce SSL.
+
+VERIFY_CA
+Enforce SSL and verify the certificate authority (CA).
+
+VERIFY_IDENTITY
+Enforce SSL and verify the CA and CA hostname.
+-----------------------------------------------------------------------------------------------------------------------------
