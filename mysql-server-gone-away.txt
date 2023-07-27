@@ -1,0 +1,14 @@
+472
+
+I have encountered this a number of times and I've normally found the answer to be a very low default setting of max_allowed_packet.
+
+Raising it in /etc/my.cnf (under [mysqld]) to 8 or 16M usually fixes it. (The default in MySql 5.7 is 4194304, which is 4MB.)
+
+[mysqld]
+max_allowed_packet=16M
+Note: Just create the line if it does not exist, it must appear as an entry underneath [mysqld]
+
+Note: This can be set on your server as it's running but it will be lost after the mysql daemon is restarted. 
+Use SET GLOBAL max_allowed_packet=104857600 (this sets it to 100MB)
+
+Note: On Windows you may need to save your my.ini or my.cnf file with ANSI not UTF-8 encoding.
