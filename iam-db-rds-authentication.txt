@@ -14,6 +14,22 @@ iam policy---->policy1
 		}
 	]
 }
+################################################################################################
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"rds-db:connect"
+			],
+			"Resource": [
+				"arn:aws:rds-db:us-east-1:291222035571:dbuser:prx-0fd2e948d5b70f37c/ecomuser"
+			]
+		}
+	]
+}
+########################################################################
 ------------------------ allows access to two different database users in a DB instance.-----------------------------------------
 {
    "Version": "2012-10-17",
@@ -81,6 +97,9 @@ db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E
 If you are using Amazon Aurora, specify a DbClusterResourceId instead of a DbiResourceId.
 ------------------------------------------------------------------------------------------------------------------
 If you are connecting to a database through RDS Proxy, specify the proxy resource ID, such as prx-ABCDEFGHIJKL01234
+
+[ec2-user@ip-172-31-4-143 html]$ aws rds describe-db-proxies --db-proxy-name proxy1 | grep prx-
+            "DBProxyArn": "arn:aws:rds:us-east-1:291222035571:db-proxy:prx-0fd2e948d5b70f37c", 
 ------------------------------------------------------------------------------------------------------------------
 With IAM database authentication, you don't need to assign database passwords to the user accounts you create.
 If you remove a user that is mapped to a database account, you should also remove the database account with the DROP USER statement.
