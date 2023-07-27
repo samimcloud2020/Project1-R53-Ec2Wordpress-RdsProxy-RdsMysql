@@ -1,0 +1,160 @@
+--------------------------------create rds inst-------------------------------------------------------------------------
+RDS---->MYSQL--->
+
+In a production setup, you may want to use features of Amazon RDS that are outside the Free Tier. These include:
+
+A larger database instance class, for improved performance
+Multi-AZ deployments, for automatic failover and recovery in the event of an infrastructure issue
+Provisioned IOPS for disk storage, for faster I/O performance
+
+DB INSTANCE IDENTIFIER: ecomdb
+username: admin
+password: admin123
+
+brustable classes: t3.db.micro
+
+storage type: gp2 ssd
+allocate stoage: 20gb
+enable: auto storage scaling
+max storage threshold: 1000gb
+
+
+Amazon RDS instances must be created in an Amazon VPC, which is a logically separate network 
+where your provisioned resources will live.
+
+
+do not con to ec2 compute resource: manually you can do
+
+default vpc
+db subnet group
+public access: no
+
+vpc sg: default                    mysql/aurora 3306    allow ec2 sg
+
+az: us-east-1a
+rds proxy: no      HA rds proxy.fully managed.auto creates iam role and secret manager secret for rds proxy 
+
+db option:
+
+intial db name: ecomdb
+db parameter group:default mysql8.0
+
+--------------------------------------------------ec2------------------------------------------------------
+
+amazon linux kernel 5.10 ami
+t2.micro
+us-east-1a
+sg: wordpress      http 80 0.0.0.0/0
+                   ssh 22 0.0.0.0/0  or my ip
+
+ssh key:
+
+--------------------------------login ec2---------------------------------------------------------------------------
+chmod 400 <path/to/pem/file> 
+ssh -i <path/to/pem/file> ec2-user@<public_IP_DNSAddress>
+
+sudo yum install -y mysql
+export MYSQL_HOST=<your-endpoint>
+mysql --user=admin  --password=admin123 ecomdb
+
+CREATE USER 'ecomuser' IDENTIFIED BY 'ecompassword';
+GRANT ALL PRIVILEGES ON ecomdb.* TO ecomuser;
+FLUSH PRIVILEGES;
+
+USE ecomdb;
+CREATE TABLE products (id mediumint(8) unsigned NOT NULL auto_increment,Name varchar(255) default NULL,Price varchar(255) default NULL, ImageUrl varchar(255) default NULL,PRIMARY KEY (id)) AUTO_INCREMENT=1;
+
+INSERT INTO products (Name,Price,ImageUrl) VALUES ("Laptop","100","c-1.png"),("Drone","200","c-2.png"),("VR","300","c-3.png"),("Tablet","50","c-5.png"),("Watch","90","c-6.png"),("Phone Covers","20","c-7.png"),("Phone","80","c-8.png"),("Laptop","150","c-4.png");
+
+exit
+
+----------------------install apache-------------------------------------------------
+sudo yum install -y httpd
+sudo service httpd start
+
+------------------install wordpress---------------------------------------------------
+wget https://wordpress.org/latest.tar.gz
+tar -xzf latest.tar.gz
+
+$ ls
+latest.tar.gz  wordpress
+
+cd wordpress
+cp wp-config-sample.php wp-config.php
+
+nano wp-config.php
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'database_name_here' );
+
+/** MySQL database username */
+define( 'DB_USER', 'username_here' );
+
+/** MySQL database password */
+define( 'DB_PASSWORD', 'password_here' );
+
+/** MySQL hostname */
+define( 'DB_HOST', 'localhost' );
+
+
+The second configuration section you need to configure is the Authentication Unique Keys and Salts. It looks as follows in the configuration file:
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY',         'put your unique phrase here' );
+define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
+define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
+define( 'NONCE_KEY',        'put your unique phrase here' );
+define( 'AUTH_SALT',        'put your unique phrase here' );
+define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
+define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
+define( 'NONCE_SALT',       'put your unique phrase here' );
+
+
+
+
+
+
+define('AUTH_KEY',         '&Ht/{}os%i-fC{L u=7rjy1.w5295RQ@V&(4`Ad60 [B$gdSLvd*Px~-NK+PiVh5');
+define('SECURE_AUTH_KEY',  '--c=KhZ{+fFe|GOF$VG.*PCY5Xqj}Kxs5E]C&i:gR0O^>Eb}Kdf2CHQnp6e2j-H+');
+define('LOGGED_IN_KEY',    'h^k@=!=5FwwggsMYJ~#!bolRioCSF+hHpHlQl0^}?6;(|rjt_G7JY5_HE>i|#J**');
+define('NONCE_KEY',        '7. #U1zQ]9@FT.S;HZi]x&{~x:+38!R>PH8z-LG~Pp[MMBvF.,{Bdys:)D&|sjKD');
+define('AUTH_SALT',        '$J=)!e5*jJt6K qPb]7@k|CeGW)azD64+i9N6)f fjVrELB)yaAm2N#HC*A@iKv?');
+define('SECURE_AUTH_SALT', '^X|-S`b^G6dha-#Ao+>9#4#GQ&n2+lJwZ;5~Kq,$cEb_>{Tfq*j+Q ,Y $z}Ba;/');
+define('LOGGED_IN_SALT',   '5*`jV?po!4|G:E*#YYM2le$dwS@<k0;DQ}lm<QDi1}n/KHyq$|*a7Iw93+T5Nx[x');
+define('NONCE_SALT',       '1)S{{4:8V4nWf,91k%IB:q+}+gM@Kk$u,`V=9?_xx~Mv;}k3vf<?F-Ftk3u*qbD3');
+
+
+
+--------------------------deploy wordpress----------------------------------------------
+sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+
+cd /home/ec2-user
+
+sudo cp -r wordpress/* /var/www/html/
+
+sudo service httpd restart
+
+
+one thing to
+
+cd /var/www/html
+git clone https://github.com/samimcloud2020/ansible-lamp.git
+cp -rf /var/www/html/ansible-lamp/* .
+
+sudo service httpd restart
+--------------------------------------------------------------------------------------------------
+
+
+
+
+
+
