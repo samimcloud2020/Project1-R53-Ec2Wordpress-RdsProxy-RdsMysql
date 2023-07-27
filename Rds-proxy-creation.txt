@@ -1,0 +1,64 @@
+SECRET_NAME="ecomdb/db/creds"
+DB_HOST=$(aws rds describe-db-cluster-endpoints --query "DBClusterEndpoints[?EndpointType=='WRITER'].Endpoint" --output text)
+DB_IDENTIFIER=$(aws rds describe-db-cluster-endpoints --query "DBClusterEndpoints[?EndpointType=='WRITER'].DBClusterIdentifier" --output text)
+aws secretsmanager create-secret \
+  --name $SECRET_NAME \
+  --secret-string '{"username":"ecomuser","password":"ecompassword","engine":"mysql","host":"'$DB_HOST'","port":3306,"dbname":"ecomdb","dbClusterIdentifier":"'$DB_IDENTIFIER'"}'
+
+
+SECRET_ARN=$(aws secretsmanager list-secrets --query "SecretList[?Name=='$SECRET_NAME'].ARN" --output text)
+echo $SECRET_ARN
+
+
+-----------------------------------------------------------------------------------------------
+rds proxy console:---
+create proxy-----
+proxy identifier: proxy1
+engine compatibility: mysql
+
+db: ecomdb
+con pool max con: 100 %
+add reader endpoint: yes
+
+secret manager secrets: ecomdb/db/creds
+iam role: create iam role
+vpc sg: default, applicationsg
+
+create proxy
+----------------------------aws cloud9---------------------------------------------------------------------------
+Wait for RDS proxy to be readyHeader anchor link
+Once the proxy is creating navigate back to Cloud9 and run the following command in the terminal
+
+
+until aws rds describe-db-proxies --query "DBProxies[?DBProxyName=='awsomepets-proxy'].Status" --output text | grep "available" 
+  do echo "waiting for Proxy to be ready" && sleep 5 
+  done
+
+---------------------------------------------------------------------------------------------------------------
+Deploy the changesHeader anchor link
+Update the env variable for the application.
+By removing the DB_IMPL environment variable, the application will use the default implementation db.js,
+without application pooling.
+
+
+cd ${HOME}/environment/MonolithBackend
+PROXY_ENDPOINT=$(aws rds describe-db-proxies --query "DBProxies[?DBProxyName=='proxy1'].Endpoint" --output text)
+eb setenv DB_HOST=$PROXY_ENDPOINT DB_IMPL= 
+eb deploy
+eb printenv
+
+By updating the DB_HOST environment variable, the application will connect to RDS Proxy instead of connecting to the database directly.
+---------------------------------------------------------------------------------------------------------------
+Run the test again
+Let's run the performance test again to observe what difference it made using RDS Proxy.
+Run the test with the following commands:
+
+cd ${HOME}/environment/loadtest
+curl $BASE_URL'/api/delete' && curl $BASE_URL'/api/init' 
+mvn gatling:test
+----------------------------------------------------------------------------------------------------------------------------
+Analyse the result
+Once the performance test is finished, view performance test results
+
+c9 open "./target/gatling/$(cat target/gatling/lastRun.txt)/index.html"  
+
