@@ -204,4 +204,69 @@ try:
 except Exception as e:
     print("Database connection failed due to {}".format(e))          
 -----------------------------------------------------------------------------------------------------------------------
+[ec2-user@ip-172-31-4-143 html]$ aws rds describe-db-proxies --query '*[*].{DBProxyName:DBProxyName,Endpoint:Endpoint}'
+[
+    [
+        {
+            "Endpoint": "proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com", 
+            "DBProxyName": "proxy1"
+        }
+    ]
+]
+[ec2-user@ip-172-31-4-143 html]$ aws rds describe-db-proxies --db-proxy-name proxy1
+{
+    "DBProxies": [
+        {
+            "Status": "available", 
+            "Endpoint": "proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com", 
+            "VpcSubnetIds": [
+                "subnet-01b5f98c066f2f884", 
+                "subnet-0daebe20380baf5a8", 
+                "subnet-0f0e283b1b490e5d1", 
+                "subnet-062ac4058a80adee1", 
+                "subnet-0fbfc73525169a2de"
+            ], 
+            "RequireTLS": true, 
+            "RoleArn": "arn:aws:iam::291222035571:role/rds-proxy-role", 
+            "VpcSecurityGroupIds": [
+                "sg-04719b2e5747715ef"
+            ], 
+            "Auth": [
+                {
+                    "SecretArn": "arn:aws:secretsmanager:us-east-1:291222035571:secret:prod/rdsproxy/mysql-4UIpPj", 
+                    "AuthScheme": "SECRETS", 
+                    "IAMAuth": "REQUIRED"
+                }
+            ], 
+            "DBProxyArn": "arn:aws:rds:us-east-1:291222035571:db-proxy:prx-0fd2e948d5b70f37c", 
+            "UpdatedDate": "2023-07-27T13:33:57.092Z", 
+            "IdleClientTimeout": 5400, 
+            "CreatedDate": "2023-07-27T13:21:01.576Z", 
+            "DebugLogging": true, 
+            "DBProxyName": "proxy1", 
+            "EngineFamily": "MYSQL"
+        }
+    ]
+}
+[ec2-user@ip-172-31-4-143 html]$ aws rds describe-db-proxy-target-groups --db-proxy-name proxy1
+{
+    "TargetGroups": [
+        {
+            "Status": "available", 
+            "TargetGroupArn": "arn:aws:rds:us-east-1:291222035571:target-group:prx-tg-02089e20cd0946a86", 
+            "UpdatedDate": "2023-07-27T13:21:04.265Z", 
+            "ConnectionPoolConfig": {
+                "MaxIdleConnectionsPercent": 50, 
+                "ConnectionBorrowTimeout": 120, 
+                "MaxConnectionsPercent": 100, 
+                "SessionPinningFilters": []
+            }, 
+            "TargetGroupName": "default", 
+            "CreatedDate": "2023-07-27T13:21:01.576Z", 
+            "DBProxyName": "proxy1", 
+            "IsDefault": true
+        }
+    ]
+}
+----------------------------------------------------------------------------------------------------------------------
 
