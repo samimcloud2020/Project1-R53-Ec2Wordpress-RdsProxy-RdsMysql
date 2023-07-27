@@ -1,0 +1,2 @@
+[ec2-user@ip-172-31-4-143 html]$ aws rds generate-db-auth-token --hostname proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com --port 1433 --region us-east-1 --username ecomuser
+proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com:1433/?Action=connect&DBUser=ecomuser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=900&X-Amz-Credential=AKIAUHTRPTRZ4YX72CP2%2F20230727%2Fus-east-1%2Frds-db%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Date=20230727T142730Z&X-Amz-Signature=525a919a81d568709ae9e0ceb7af20beef5e4d175786b7c82528194ab0dfbac4
