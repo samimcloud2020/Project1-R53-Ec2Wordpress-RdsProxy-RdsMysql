@@ -1,0 +1,109 @@
+AWS RDS proxy is a fully-managed database proxy for Amazon RDS.
+RDS proxy works by pooling and sharing DB connections and thus makes
+applications more scalable as well as resilient to database failures. 
+-----------------------------------------------------------------------------------------------
+They key benefits of using RDS proxy are:
+
+Connection pooling and sharing: Improves application performance by 
+reducing the number of open database connections.
+
+RDS proxy helps improve application availability during
+failure scenarios such as a database failover.
+
+RDS Proxy gives you the choice to use IAM authentication for connecting to the database, 
+thus removing the need for database credentials in the application code.
+------------------------------------------------------------------------------------------------------
+RDS proxy is currently available for Aurora MySQL, Aurora PostgreSQL, RDS MySQL and RDS PostgreSQL.
+----------------------------------Rds Proxy Connection Pooling------------------------------------------
+lambda---------->rds proxy------->rds(mysql)
+
+Connection pooling is an optimization that enables applications to share and re-use database connections, 
+thus reducing the load on the database itself. 
+
+Opening and closing a new database connection is CPU-intensive whereas additional
+memory is needed for each open connection.
+
+Connection pooling also removes the need to worry about database connections in the application code.
+
+Each database transaction uses one underlying database connection which can be 
+reused once the transaction has finished. 
+
+This transaction-level reuse is called connection multiplexing (or connection reuse).
+
+In connection multiplexing, database connections are shared between client connections 
+which helps minimize the resource overhead on the database server.
+---------------------------------Pinning------aws recom:avoid pinning------------------------------------
+In some cases, RDS proxy can’t safely reuse a database connection outside of the current session. 
+In such scenarios, the same connection is used for the session until the session ends. 
+This behavior is called pinning.
+
+AWS recommends trying to avoid pinning as much as possible since it makes it harder
+to share connections and thus reduces the benefits of using RDS proxy.
+
+Some reasons why a connection might be pinned are:
+
+Change of session variable
+Change of configuration parameter
+-----------------------------------How are failures handled?------------------------------------
+A common failure scenario is a database failover, where the original database instance 
+becomes unavailable and is replaced by another one. A failover can happen for various reasons:
+
+Planned maintenance such as a database upgrade.
+
+A problem with the database instance itself.
+
+RDS proxy can improve application availability in such a situation by 
+waiting for the new database instance to be functional and maintaining any requests received 
+from the application during this time. 
+
+The end result is that the application is more resilient to issues with the underlying database.
+
+AWS claims that RDS proxy improves failover times by 30-60%.
+
+------------What are the security benefits of using RDS proxy?-----------------------------------
+RDS proxy can provide an additional layer of security between the application and the underlying database.
+
+AWS recommends enforcing IAM authentication while connecting to the proxy as that eliminates 
+the need to specify database credentials anywhere in the code.
+--------------------pricing----------------------------------------------------------------
+Amazon RDS Proxy is priced per vCPU per hour for each database instance for which it is enabled. 
+The price depends on the RDS instance type used by your database. The larger the database instance,
+the more you end up paying.
+
+Partial hours are billed in one-second increments with a 10-minute minimum charge.
+-----------------------------How to monitor RDS proxy?--------------------------------------
+RDS proxy can be monitored by using Amazon CloudWatch. CloudWatch is well integrated with RDS proxy
+and provides useful metrics that can be used to understanding the performance and behavior of the proxy.
+
+Some key metrics to keep an eye are:
+
+DatabaseConnections: Number of database connections to the backend database.
+
+DatabaseConnectionsCurrentlyBorrowed: Number of connections currently being 
+used by your application. Important to set an alarm on this metric.
+
+DatabaseConnectionsCurrentlySessionPinned: Number of connections in the pinned state.
+This number should ideally be as low as possible to maximize RDS proxy performance.
+------------------------What are the limitations?--------------------------------------------------
+Some key limitations for RDS proxy are:
+
+RDS proxy must be in the same VPC as the database instance. 
+
+The proxy cannot be publicly accessible even if the database instance is.
+
+RDS proxy cannot be used with a self-managed EC2-instance based database.
+
+RDS proxy cannot be used for Aurora Serverless yet
+
+A proxy can only be associated with 1 Database instance
+-------------------------conclusion-----------------------------------------------------------------------
+Amazon RDS proxy is a database proxy that helps improve application availability and performance. 
+It is particularly helpful for applications that have the following requirements:
+
+Unpredictable workloads
+Frequently open and close database connections
+Higher availability during transient database failures
+
+----------------------------------------------------------------------------------------------------
+
+
