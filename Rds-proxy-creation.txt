@@ -56,9 +56,34 @@ Run the test with the following commands:
 cd ${HOME}/environment/loadtest
 curl $BASE_URL'/api/delete' && curl $BASE_URL'/api/init' 
 mvn gatling:test
-----------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------gatling---------------------------------------------------------------------------------
 Analyse the result
 Once the performance test is finished, view performance test results
 
 c9 open "./target/gatling/$(cat target/gatling/lastRun.txt)/index.html"  
+--------------------------------------------xray---------------------------------------------------------------------------
+As you can see, we have reduced the error rate significantly, and you can observe the same trend in X-ray .
+In X-Ray you should also be able to analyse the errors, and notice that there are no more "Too Many connections" errors.
 
+You can spot check a few request to validate that there are no "Too Many connections" errors. 
+You will see a number of Deadlocks which we will address later in the workshop.
+------------------------------------------cloudwatch--------------------------------------------------------------------------------
+Lastly, you take a look at the number of connections created in the database by using the Aurora RDS metrics.
+You will see that this time the connections reach the maximum number (90), but we do not receive the same error in the application layer.
+-------------------------------------------------------------------------------------------------------------------------------
+Open your RDS Proxy  and take a look at the metrics
+
+Scroll down to Metrics and you should see 3 metrics: QueryRequests, ClientConnections and DatabaseConnections.
+------------------------------------------------------------------------------------------------------------------------------
+You can see from this image that RDS proxy had 2,702 connections opened from the applications, 
+however the number of connections opened with the database remained within the maximum of 90.
+----------------------------------------------------------------------------------------------------------------------------
+How does RDS proxy solve the issue with stranded connections????????????????
+RDS proxy performs connection multiplexing, also known as connection reuse.
+With multiplexing, RDS Proxy performs all the operations for a transaction using one underlying database connection, 
+then can use a different connection for the next transaction. You can open many simultaneous connections to the proxy,
+and the proxy keeps a smaller number of connections open to the DB instance or cluster.
+
+Doing so further minimizes the memory overhead for connections on the database server. 
+This technique also reduces the chance of "too many connections" errors.
+--------------------------------------------------------------------------------------------------------------------------------
