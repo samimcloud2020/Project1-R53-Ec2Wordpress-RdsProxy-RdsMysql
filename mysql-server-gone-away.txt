@@ -12,3 +12,10 @@ Note: This can be set on your server as it's running but it will be lost after t
 Use SET GLOBAL max_allowed_packet=104857600 (this sets it to 100MB)
 
 Note: On Windows you may need to save your my.ini or my.cnf file with ANSI not UTF-8 encoding.
+-------------------------------------------------------------------------------------------
+45
+
+I used following command in MySQL command-line to restore a MySQL database which size more than 7GB, and it works.
+
+set global max_allowed_packet=268435456;
+-------------------------------------------------------------------------------
