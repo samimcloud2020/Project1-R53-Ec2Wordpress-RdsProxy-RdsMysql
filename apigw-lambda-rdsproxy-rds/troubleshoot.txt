@@ -1,0 +1,22 @@
+#########Troubleshoot Rds proxy Target Group###################################
+
+aws rds describe-db-proxies --db-proxy-name $DB_PROXY_NAME
+aws rds describe-db-proxy-target-groups --db-proxy-name $DB_PROXY_NAME
+
+A State value of AVAILABLE indicates that the proxy can connect to the DB instance.
+
+A State value of UNAVAILABLE indicates a temporary or permanent connection problem. 
+
+In this case, examine the Reason and Description fields. For example, if Reason has a value of PENDING_PROXY_CAPACITY,
+try connecting again after the proxy finishes its scaling operation. 
+
+If Reason has a value of UNREACHABLE, CONNECTION_FAILED, or AUTH_FAILURE, use the explanation from the Description field to help you diagnose the issue.
+
+The State field might have a value of REGISTERING for a brief time before changing to AVAILABLE or UNAVAILABLE.
+####################################################################################
+nc -zx MySQL_proxy_endpoint 3306
+
+nc -zx PostgreSQL_proxy_endpoint 5432
+#########################################################################################
+check SG LAMBDA, RDSPROXY SG, RDS SG
+###################################################################################
