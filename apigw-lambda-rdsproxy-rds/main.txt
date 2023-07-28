@@ -100,14 +100,14 @@ case1:---To create the deployment package (project directory)
 $mkdir my-function
 $cd my-function
 $ls
-app.py
+lambda_function.py
 $mkdir package
-$pip install --target ./package mysql-connector-python
-$pip install --target ./package boto3
+$pip3 install --target ./package mysql-connector-python
+$pip3 install --target ./package boto3
 $cd package
 $zip -r ../my_deployment_package.zip .
 $cd ..
-$zip my_deployment_package.zip app.py
+$zip my_deployment_package.zip lambda_function.py
 $ls
 my_deployment_package.zip    <-----all dependiemcies with app.py
 
