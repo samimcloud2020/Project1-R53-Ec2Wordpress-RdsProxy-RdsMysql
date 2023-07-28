@@ -95,8 +95,66 @@ def lambda_handler(event, context):
 
 
 ---------------------------------how to package   mysql-connector-python------------------------------------
+case1:---To create the deployment package (project directory)
 
-$
+$mkdir my-function
+$cd my-function
+$ls
+app.py
+$mkdir package
+$pip install --target ./package mysql-connector-python
+$pip install --target ./package boto3
+$cd package
+$zip -r ../my_deployment_package.zip .
+$cd ..
+$zip my_deployment_package.zip app.py
+$ls
+my_deployment_package.zip    <-----all dependiemcies with app.py
+
+
+
+case2:----To create the deployment package (virtual environment)
+
+$mkdir my_function
+$cd my_function
+$ls
+app.py
+root@SDOP_Ts:~/my_function# python3.10 -m venv my_virtual_env
+root@SDOP_Ts:~/my_function# ls
+app.py  my_virtual_env
+
+root@SDOP_Ts:~/my_function# source ./my_virtual_env/bin/activate
+(my_virtual_env) root@SDOP_Ts:~/my_function#
+(my_virtual_env) root@SDOP_Ts:~/my_function# pip install mysql-connector-python
+(my_virtual_env) root@SDOP_Ts:~/my_function# pip show mysql-connector-python
+Name: mysql-connector-python
+Version: 8.1.0
+Summary: MySQL driver written in Python
+Home-page: http://dev.mysql.com/doc/connector-python/en/index.html
+Author: Oracle and/or its affiliates
+Author-email:
+License: GNU GPLv2 (with FOSS License Exception)
+Location: /root/my_function/my_virtual_env/lib/python3.10/site-packages  <------
+Requires: protobuf
+Required-by:
+
+(my_virtual_env) root@SDOP_Ts:~/my_function# deactivate
+root@SDOP_Ts:~/my_function#
+
+root@SDOP_Ts:~/my_function# cd /root/my_function/my_virtual_env/lib/python3.10/site-packages  <---
+root@SDOP_Ts:~/my_function/my_virtual_env/lib/python3.10/site-packages#
+
+root@SDOP_Ts:~/my_function/my_virtual_env/lib/python3.10/site-packages# zip -r ../../../../my_deployment_package.zip .
+
+
+root@SDOP_Ts:~/my_function/my_virtual_env/lib/python3.10/site-packages# cd ../../../../   <----parent dir
+root@SDOP_Ts:~/my_function#
+
+
+root@SDOP_Ts:~/my_function# zip my_deployment_package.zip app.py
+  adding: app.py (deflated 51%)
+root@SDOP_Ts:~/my_function# ls
+app.py  my_deployment_package.zip  my_virtual_env
 -----------------------------------------------------------------------------------------------------
 policy----policy2   (for *  use can  db-FLVJNWOVQAPL3AOQYW3LACCMUA )
 [ec2-user@ip-172-31-4-143 ~]$ aws rds describe-db-instances --query "DBInstances[*].[DBInstanceIdentifier,DbiResourceId]"
