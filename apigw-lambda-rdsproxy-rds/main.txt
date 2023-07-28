@@ -36,7 +36,7 @@ policy----policy1
 
 
 
-role-----rds----add role database rds-----attach policy policy1--------rolename: role1
+role-----rds----add role database rds-----attach policy policy1--------rolename: rdsproxy-access-SM-RDS-role1
 
 trust policy:
 
@@ -98,7 +98,15 @@ def lambda_handler(event, context):
 
 $
 -----------------------------------------------------------------------------------------------------
-policy----policy2   (for *  use can
+policy----policy2   (for *  use can  db-FLVJNWOVQAPL3AOQYW3LACCMUA )
+[ec2-user@ip-172-31-4-143 ~]$ aws rds describe-db-instances --query "DBInstances[*].[DBInstanceIdentifier,DbiResourceId]"
+[
+    [
+        "ecomdb", 
+        "db-FLVJNWOVQAPL3AOQYW3LACCMUA"
+    ]
+]
+
 
 
 
@@ -118,4 +126,5 @@ policy----policy2   (for *  use can
 }
 
 
-role-----lambda-----policy2--------role2
+role-----lambda-----policy2--------lambda-access-rds-role2
+----------------------------------------------------------------------------------------------------------------
