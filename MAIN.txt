@@ -57,6 +57,10 @@ sudo yum install -y mysql
 export MYSQL_HOST=<your-endpoint>
 mysql --user=admin  --password=admin123 ecomdb
 
+CREATE USER 'lambdauser'@'%' IDENTIFIED BY 'lambdapassword';
+GRANT SELECT, INSERT, UPDATE ON dbname.* TO 'lambdauser';
+FLUSH PRIVILEGES;
+
 CREATE USER 'ecomuser' IDENTIFIED BY 'ecompassword';
 GRANT ALL PRIVILEGES ON ecomdb.* TO ecomuser;
 FLUSH PRIVILEGES;
