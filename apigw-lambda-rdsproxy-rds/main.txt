@@ -18,7 +18,7 @@ policy----policy1
         "secretsmanager:ListSecretVersionIds"
       ],
       "Resource": [
-        "arn:aws:secretsmanager:us-east-1:[your-account-number]:secret:secret1"
+        "arn:aws:secretsmanager:us-east-1:[your-account-number]:secret:secret1"    <----not work then *
       ]
     },
     {
