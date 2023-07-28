@@ -1,0 +1,43 @@
+[ec2-user@ip-172-31-4-143 ~]$ aws lambda invoke --function-name rds out --log-type Tail --query 'LogResult' --output text  | base64 --decode
+START RequestId: ab23898a-a506-4296-94fd-325735f88f0a Version: $LATEST
+[{'id': 1, 'Name': 'Laptop', 'Price': '100', 'ImageUrl': 'c-1.png'}, {'id': 2, 'Name': 'Drone', 'Price': '200', 'ImageUrl': 'c-2.png'}, {'id': 3, 'Name': 'VR', 'Price': '300', 'ImageUrl': 'c-3.png'}, {'id': 4, 'Name': 'Tablet', 'Price': '50', 'ImageUrl': 'c-5.png'}, {'id': 5, 'Name': 'Watch', 'Price': '90', 'ImageUrl': 'c-6.png'}, {'id': 6, 'Name': 'Phone Covers', 'Price': '20', 'ImageUrl': 'c-7.png'}, {'id': 7, 'Name': 'Phone', 'Price': '80', 'ImageUrl': 'c-8.png'}, {'id': 8, 'Name': 'Laptop', 'Price': '150', 'ImageUrl': 'c-4.png'}]
+END RequestId: ab23898a-a506-4296-94fd-325735f88f0a
+REPORT RequestId: ab23898a-a506-4296-94fd-325735f88f0a  Duration: 12.53 ms      Billed Duration: 13 ms  Memory Size: 128 MB     Max Memory Used: 77 MB
+
+
+
+#####################################  CLOUDWATCH  ##########################################
+METRIC:----------------------------------------------------------------------------------
+cw---->metrics----rds----per-proxy-metrics-------
+proxy1-----databaseconrequest------------------>metric
+proxy1------databasecon-------------------->metric
+
+LOG GROUP:----------------------------------------------------------------------------------
+
+/aws/rds/proxy/proxy1
+
+LOG STREAM:PROXY1
+
+2023-07-28T17:01:26.304Z [INFO] [dbConnection=2687989885] A TCP connection was established from the proxy at 172.31.22.79:33071 
+to the database at 172.31.3.72:3306.
+#####################################CLOUDWATCH   LAMBDA INSIGHT BY ENABLE LAMBDA ENCHANCED MONITORING##################
+
+
+
+##########################################  RDSPROXY  #############################################################
+QUERY REQUESTS
+
+CLIENT CON
+
+DB CON
+######################################### LAMBDA     ######################################################################
+MONIROR--------METRICS,LOG,TRACES(SERVICE LENS,AWS XRAY)
+
+############################################################################################################################
+############ Monitor Amazon RDS Proxy with Datadog  #######################################################################
+
+
+
+
+
+
