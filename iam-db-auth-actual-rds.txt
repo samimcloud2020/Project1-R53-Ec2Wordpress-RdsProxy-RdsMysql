@@ -1,0 +1,169 @@
+policy------policy1
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"rds-db:connect"
+			],
+			"Resource": [
+				"arn:aws:rds-db:us-east-1:291222035571:dbuser:db-PHEYPFTZYKMPPDYPI2GJ6ZVW6E/ecomuser"
+			]
+		}
+	]
+}
+-------------------------------------------------------------------------------------------------------------
+[ec2-user@ip-172-31-4-143 ~]$ aws rds describe-db-instances --query "DBInstances[*].[DBInstanceIdentifier,DbiResourceId]"
+[
+    [
+        "ecomdb", 
+        "db-FLVJNWOVQAPL3AOQYW3LACCMUA"
+    ]
+]
+-----------------------------------------------------------------------------------------------------------------
+role-----aws service-----ec2------attach policy1-------role1
+
+ec2-----modify iam role------role1
+------------------------------------------------------------------------------------------------------------
+[ec2-user@ip-172-31-4-143 html]$ export MYSQL_HOST=ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com
+
+[ec2-user@ip-172-31-4-143 html]$ mysql -h ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com -P 3306 -u admin -p 
+password:admin123
+mysql> CREATE USER ecomuser IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS'; 
+            
+
+
+
+------------------------------------------------------------------------------------------------------------------
+RDSHOST="ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com"
+TOKEN="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 3306 --region us-east-1 --username ecomuser )"
+
+[ec2-user@ip-172-31-4-143 html]$ echo $TOKEN    <------15 min expiry for token
+ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com:3306/?Action=connect&DBUser=ecomuser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=900&X-Amz-Credential=AKIAUHTRPTRZYLU3GTWT%2F20230728%2Fus-east-1%2Frds-db%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Date=20230728T032303Z&X-Amz-Signature=3423c0727122775c5e72c2107a4eb03b638244a5172127b01a71e2e8dd0f2292
+
+wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
+
+mysql --host=$RDSHOST --port=3306 --ssl-ca=global-bundle.pem --enable-cleartext-plugin --user=ecomuser --password=$TOKEN
+
+mysql> mysql> show status like 'Ssl%';
++--------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Variable_name                  | Value                                                                                                                                                                                                                                                                                                                                                              |
++--------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Ssl_accept_renegotiates        | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_accepts                    | 21                                                                                                                                                                                                                                                                                                                                                                 |
+| Ssl_callback_cache_hits        | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_cipher                     | ECDHE-RSA-AES128-GCM-SHA256                                                                                                                                                                                                                                                                                                                                        |
+| Ssl_cipher_list                | TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA:AES128-SHA:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-DSS-AES128-SHA:DHE-DSS-AES256-SHA |
+| Ssl_client_connects            | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_connect_renegotiates       | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_ctx_verify_depth           | 18446744073709551615                                                                                                                                                                                                                                                                                                                                               |
+| Ssl_ctx_verify_mode            | 5                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_default_timeout            | 7200                                                                                                                                                                                                                                                                                                                                                               |
+| Ssl_finished_accepts           | 19                                                                                                                                                                                                                                                                                                                                                                 |
+| Ssl_finished_connects          | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_server_not_after           | Aug 22 17:08:50 2024 GMT                                                                                                                                                                                                                                                                                                                                           |
+| Ssl_server_not_before          | Jul 28 02:35:53 2023 GMT                                                                                                                                                                                                                                                                                                                                           |
+| Ssl_session_cache_hits         | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_session_cache_misses       | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_session_cache_mode         | SERVER                                                                                                                                                                                                                                                                                                                                                             |
+| Ssl_session_cache_overflows    | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_session_cache_size         | 128                                                                                                                                                                                                                                                                                                                                                                |
+| Ssl_session_cache_timeout      | 300                                                                                                                                                                                                                                                                                                                                                                |
+| Ssl_session_cache_timeouts     | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_sessions_reused            | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_used_session_cache_entries | 0                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_verify_depth               | 18446744073709551615                                                                                                                                                                                                                                                                                                                                               |
+| Ssl_verify_mode                | 5                                                                                                                                                                                                                                                                                                                                                                  |
+| Ssl_version                    | TLSv1.2                                                                                                                                                                                                                                                                                                                                                            |
++--------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+26 rows in set (0.10 sec)
+-------------------------------------------------------------------------------------------------------------------
+################################################################################################################################################
+[ec2-user@ip-172-31-4-143 html]$ export MYSQL_HOST=ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com
+[ec2-user@ip-172-31-4-143 html]$ mysql --user=admin  --password=admin123 ecomdb
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 49
+Server version: 8.0.33 Source distribution
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| ecomdb             |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+mysql> select user from mysql.user;
++------------------+
+| user             |
++------------------+
+| admin            |
+| ecomuser         |
+| user1            |
+| mysql.infoschema |
+| mysql.session    |
+| mysql.sys        |
+| rdsadmin         |
++------------------+
+7 rows in set (0.02 sec)
+mysql> GRANT ALL PRIVILEGES ON ecomdb.* TO ecomuser;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> 
+mysql> USE ecomdb;
+Database changed
+mysql> CREATE TABLE products (id mediumint(8) unsigned NOT NULL auto_increment,Name varchar(255) default NULL,Price varchar(255) default NULL, ImageUrl varchar(255) default NULL,PRIMARY KEY (id)) AUTO_INCREMENT=1;
+Query OK, 0 rows affected, 1 warning (0.17 sec)
+
+mysql> 
+mysql> INSERT INTO products (Name,Price,ImageUrl) VALUES ("Laptop","100","c-1.png"),("Drone","200","c-2.png"),("VR","300","c-3.png"),("Tablet","50","c-5.png"),("Watch","90","c-6.png"),("Phone Covers","20","c-7.png"),("Phone","80","c-8.png"),("Laptop","150","c-4.png");
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> exit
+Bye
+
+###################################################################################
+$php -r 'var_dump(mysqli_connect("ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com", "ecomuser", "ecomdb.cjy9ii6a47cp.us-east-1.rds.amazonaws.com:3306/?Action=connect&DBUser=ecomuser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=900&X-Amz-Credential=AKIAUHTRPTRZYLU3GTWT%2F20230728%2Fus-east-1%2Frds-db%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Date=20230728T034248Z&X-Amz-Signature=fffa813753489bf691d57d758a245cf675886f4f5247202245b307efe3a535d8", "ecomdb" ));'
+
+
+---------------------------------------------------------------------------------------------------------------------------
+Create an SSL connection:  test.php     $php test.php
+
+<?php
+$mysqli = mysqli_init();
+if (!$mysqli) {
+  die("mysqli_init failed");
+}
+
+$mysqli -> ssl_set("key.pem", "cert.pem", "cacert.pem", NULL, NULL);
+
+if (!$mysqli -> real_connect("localhost","my_user","my_password","my_db")) {
+  die("Connect Error: " . mysqli_connect_error());
+}
+
+// Some queries...
+
+$mysqli -> close();
+?> 
+---------------------------------------------------------------------------------------------------
+
