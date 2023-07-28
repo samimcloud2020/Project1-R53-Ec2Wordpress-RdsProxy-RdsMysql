@@ -1,0 +1,97 @@
+API G/W----->LAMBDA------->RDS PROXY--------->RDS  (all in vpc)
+
+
+rds----password auth
+
+rds proxy----->iam db auth & tls  ---> access secret manager and rds
+
+lambda env variable---->
+ key                     Value
+DB_HOST	      proxy1.proxy-cjy9ii6a47cp.us-east-1.rds.amazonaws.com   <------rds proxy endpoint
+DB_NAME	      ecomdb
+DB_USER	      ecomuser
+
+###############################################################################################
+rdsproxy role---->   iam---> rds--->RDS - Add Role to Database {Allows you to grant RDS access to additional resources on your behalf.)----
+
+trust relationship--
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "rds.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+
+policy---
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:us-east-1:291222035571:secret:*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetRandomPassword",
+                "secretsmanager:ListSecrets"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+##########################################################################################################
+lambda-----
+iam------lambda-----
+
+policy---
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds-db:us-east-1:291222035571:dbuser:*/ecomuser"
+            ]
+        }
+    ]
+}
+
+AWSLambdaVPCAccessExecutionRole   (add this policy)
+
+AWSLambdaRDSProxyExecutionRole-5fa850e1-cee5-4220-a791-3e74fe161aeb  (auto generated policy when lambda trigger rdsproxy)
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "rds-db:connect",
+            "Resource": "arn:aws:rds-db:us-east-1:291222035571:dbuser:prx-0e57b8f2828485746/*"
+        }
+    ]
+}
+
+##################################################################################################################
