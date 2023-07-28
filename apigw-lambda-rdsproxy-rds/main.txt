@@ -1,0 +1,99 @@
+------------------create secret-------------------------------------------
+username: ecomuser
+password: ecompassword
+secret name: secret1
+---------------------------------------------------------------------------
+policy----policy1
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:us-east-1:[your-account-number]:secret:secret1"
+      ]
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetRandomPassword",
+        "secretsmanager:ListSecrets"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+
+
+
+role-----rds----add role database rds-----attach policy policy1--------rolename: role1
+
+trust policy:
+
+{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Sid": "",
+   "Effect": "Allow",
+   "Principal": {
+    "Service": "rds.amazonaws.com"
+   },
+   "Action": "sts:AssumeRole"
+  }
+ ]
+}
+
+----------------------------------------------------------------------------------------------------
+lambda----function----python 3.8------function1----app.py
+
+from mysql.connector import Error as mysql_error
+import boto3
+import logging
+import mysql.connector
+import os
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logging.info('Generate database token...')
+
+rds_client = boto3.client('rds')
+database_token = rds_client.generate_db_auth_token(
+    DBHostname=os.environ['DB_HOST'],
+    Port=3306,
+    DBUsername=os.environ['DB_USER'],
+    Region=os.environ['AWS_REGION']
+)
+
+logging.info('Token successfully obtained. Connecting to database...')
+
+database_connection = mysql.connector.connect(
+    host=os.environ['DB_HOST'],
+    port=3306,
+    database=os.environ['DB_NAME'],
+    user=os.environ['DB_USER'],
+    password=database_token
+)
+
+logging.info('Connected!!')
+
+def lambda_handler(event, context):
+    db_cursor = database_connection.cursor(dictionary=True)
+    query = "SELECT * FROM ecomdb LIMIT 10"
+    db_cursor.execute(query)
+    print(db_cursor.fetchall())
+
+
+---------------------------------how to package   mysql-connector-python------------------------------------
+
+$
