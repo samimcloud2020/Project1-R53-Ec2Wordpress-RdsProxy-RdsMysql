@@ -1,0 +1,24 @@
+-------------------Handling lazy loading when you create a blue/green deployment-------------------------------
+
+When you create a blue/green deployment, Amazon RDS creates the primary DB instance in the green environment 
+by restoring from a DB snapshot. 
+
+After it is created, the green DB instance continues to load data in the background, which is known as lazy loading.
+
+If the DB instance has read replicas, these are also created from DB snapshots and are subject to lazy loading.
+
+If you access data that hasn't been loaded yet, the DB instance immediately downloads the requested data from Amazon S3, 
+and then continues loading the rest of the data in the background. 
+
+To help mitigate the effects of lazy loading on tables to which you require quick access,
+you can perform operations that involve full-table scans, such as SELECT *. 
+This operation allows Amazon RDS to download all of the backed-up table data from S3.
+
+If an application attempts to access data that isn't loaded, the application can encounter higher latency 
+than normal while the data is loaded. 
+This higher latency due to lazy loading could lead to poor performance for latency-sensitive workloads.
+
+Important
+If you switch over a blue/green deployment before data loading is complete,
+your application could experience performance issues due to high latency.
+------------------------------------------------------------------------------------------------------------
