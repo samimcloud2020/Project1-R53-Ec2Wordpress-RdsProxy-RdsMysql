@@ -1,0 +1,18 @@
+-----------------Authorizing access to blue/green deployment operations-------------------------------------
+The user who creates a blue/green deployment must have permissions to perform the following RDS operations:
+
+rds:AddTagsToResource
+
+rds:CreateDBInstanceReadReplica
+------------------------------------------------------------------------------------------------------------
+The user who switches over a blue/green deployment must have permissions to perform the following RDS operations:
+
+rds:ModifyDBInstance
+
+rds:PromoteDBInstance
+--------------------------------------------------------------------------------------------------------------
+The user who deletes a blue/green deployment must have permissions to perform the following RDS operation:
+
+rds:DeleteDBInstance
+----------------------------------------------------------------------------------------------------------------
+
