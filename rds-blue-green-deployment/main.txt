@@ -1,0 +1,51 @@
+A blue/green deployment creates a staging environment that copies the production environment. 
+
+In a blue/green deployment, the blue environment is the current production environment. 
+
+The green environment is the staging environment. 
+
+The staging environment stays in sync with the current production environment using logical replication.
+############################################################################################################
+you can upgrade the major or minor DB engine version, change database parameters, or make schema changes in the staging environment.
+
+You can thoroughly test changes in the green environment.
+
+When ready, you can switch over the environments to promote the green environment to be the new production environment. 
+
+The switchover typically takes under a minute with no data loss and no need for application changes.
+
+############################################################################################################
+Because the green environment is a copy of the topology of the production environment, 
+the green environment includes the features used by the DB instance. 
+
+These features include the read replicas, the storage configuration, DB snapshots, automated backups, Performance Insights, and Enhanced Monitoring.
+
+If the blue DB instance is a Multi-AZ DB instance deployment, then the green DB instance is also a Multi-AZ DB instance deployment.
+
+############################################################################################################
+Currently, blue/green deployments are supported only for RDS for MariaDB and RDS for MySQL. 
+####################################Blue/green deployments provide the following benefits: #######################################
+
+Easily create a production-ready staging environment.
+
+Automatically replicate database changes from the production environment to the staging environment.
+
+Test database changes in a safe staging environment without affecting the production environment.
+
+Stay current with database patches and system updates.
+
+Implement and test newer database features.
+
+Switch over your staging environment to be the new production environment without changes to your application.
+
+Safely switch over through the use of built-in switchover guardrails.
+
+Eliminate data loss during switchover.
+
+Switch over quickly, typically under a minute depending on your workload.
+
+###########################################################################################################################
+
+
+
+
