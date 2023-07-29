@@ -1,0 +1,27 @@
+Avoid using non-transactional storage engines, such as MyISAM, that aren't optimized for replication.
+-----------------------------------------------------------------------------------------------------------
+Optimize read replicas for binary log replication.
+
+if your DB engine version supports it, consider using GTID replication, parallel replication,
+and crash-safe replication in your production environment before deploying your blue/green deployment. 
+
+These options promote consistency and durability of your data before you switch over your blue/green deployment.
+-----------------------------------------------------------------------------------------------------------
+Thoroughly test the DB instances in the green environment before switching over.
+-----------------------------------------------------------------------------------------------------------
+Keep your databases in the green environment read only. 
+
+We recommend that you enable write operations on the green environment with caution because they can result in replication conflicts.
+
+They can also result in unintended data in the production databases after switchover.
+---------------------------------------------------------------------------------------------------------------
+When using a blue/green deployment to implement schema changes, make only replication-compatible changes.
+
+EX:
+you can add new columns at the end of a table, create indexes, or drop indexes without 
+disrupting replication from the blue deployment to the green deployment.
+
+However, schema changes, such as renaming columns or renaming tables, break binary log replication to the green deployment.
+-----------------------------------------------------------------------------------------------------------------------
+After you create the blue/green deployment, handle lazy loading if necessary. Make sure data loading is complete before switching over.
+---------------------------------------------------------------------------------------------------------------------------------------
