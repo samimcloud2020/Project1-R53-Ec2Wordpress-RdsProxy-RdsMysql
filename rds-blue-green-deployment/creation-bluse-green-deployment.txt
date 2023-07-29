@@ -1,0 +1,62 @@
+When you create a blue/green deployment, you specify the DB instance to copy in the deployment. 
+
+The DB instance you choose is the production DB instance, and it becomes the primary DB instance in the blue environment. 
+
+This DB instance is copied to the green environment, and RDS configures replication from the DB instance in the blue environment 
+to the DB instance in the green environment.
+
+RDS copies the blue environment's topology to a staging area, along with its configured features.
+
+When the blue DB instance has read replicas, the read replicas are copied as read replicas of the green DB instance in the deployment.
+If the blue DB instance is a Multi-AZ DB instance deployment, then the green DB instance is created as a Multi-AZ DB instance deployment.
+##################################################################################################################################
+########## Making changes in the green environment ###############################################################################
+
+You can make the following changes to the DB instance in the green environment when you create the blue/green deployment:
+
+You can specify a higher engine version if you want to test a DB engine upgrade.   <-----------HIGHER ENGINE VER
+
+You can specify a DB parameter group that is different from the one used by the DB instance in the blue environment.<----DB PARAMETER GROUP
+
+You can test how parameter changes affect the DB instances in the green environment or 
+specify a parameter group for a new major DB engine version in the case of an upgrade.
+
+If you specify a different DB parameter group, the specified DB parameter group is associated 
+with all of the DB instances in the green environment.
+
+If you don't specify a different parameter group, each DB instance in the green environment is associated 
+with the parameter group of its corresponding blue DB instance.
+################################################################################################################################
+You can make other modifications to the DB instance in the green environment after it is deployed. 
+  
+EX:
+  you might make schema changes to your database or change the DB instance class used by one or more DB instances in the green environment.
+
+###############################################################################################################################
+
+
+aws rds create-blue-green-deployment \
+    --blue-green-deployment-name my-blue-green-deployment \
+    --source arn:aws:rds:us-east-2:123456789012:db:mydb1 \
+    --target-engine-version 8.0.31 \
+    --target-db-parameter-group-name mydbparametergroup
+
+--blue-green-deployment-name 
+    – Specify the name of the blue/green deployment.
+
+--source 
+    – Specify the ARN of the DB instance that you want to copy.
+
+--target-engine-version 
+    – Specify an engine version if you want to test a DB engine version upgrade in the green environment.
+    This option upgrades the DB instances in the green environment to the specified DB engine version.
+
+If not specified, each DB instance in the green environment is created with the same engine version
+    as the corresponding DB instance in the blue environment.
+
+--target-db-parameter-group-name 
+    – Specify a DB parameter group to associate with the DB instances in the green environment.
+
+    
+
+    
