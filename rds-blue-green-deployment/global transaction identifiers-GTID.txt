@@ -1,0 +1,74 @@
+Global transaction identifiers (GTIDs) are unique identifiers generated for committed MySQL transactions. 
+You can use GTIDs to make binlog replication simpler and easier to troubleshoot.
+---------------------------------------------------------------------------------------------------------------
+MySQL uses two different types of transactions for binlog replication:
+
+GTID transactions – Transactions that are identified by a GTID.
+
+Anonymous transactions – Transactions that don't have a GTID assigned.
+--------------------------------------------------------------------------------------------------------------------
+In a replication configuration, GTIDs are unique across all DB instances.
+
+GTIDs simplify replication configuration because when you use them, you don't have to refer to log file positions.
+
+GTIDs also make it easier to track replicated transactions and determine whether the source instance and replicas are consistent.
+
+You can use GTID-based replication to replicate data with RDS for MySQL read replicas.
+
+You can configure GTID-based replication when you are creating new read replicas, 
+or you can convert existing read replicas to use GTID-based replication.
+
+You can also use GTID-based replication in a delayed replication configuration with RDS for MySQL.
+---------------------------------------------------------------------------------------------------------------
+gtid_mode:
+              
+OFF, OFF_PERMISSIVE, ON_PERMISSIVE, ON
+
+OFF 
+specifies that new transactions are anonymous transactions (that is, don't have GTIDs), 
+and a transaction must be anonymous to be replicated.
+
+OFF_PERMISSIVE
+specifies that new transactions are anonymous transactions, but all transactions can be replicated.
+
+ON_PERMISSIVE 
+specifies that new transactions are GTID transactions, but all transactions can be replicated.
+
+ON 
+specifies that new transactions are GTID transactions, and a transaction must be a GTID transaction to be replicated.
+
+------------------------------------------------------------------------------------------------------------
+enforce_gtid_consistency:
+
+OFF, ON, WARN
+
+OFF 
+allows transactions to violate GTID consistency.
+
+ON 
+prevents transactions from violating GTID consistency.
+
+WARN 
+allows transactions to violate GTID consistency but generates a warning when a violation occurs.
+-------------------------------------------------------------------------------------------------------------------
+####################################NOTE#####################################################################
+In the AWS Management Console, the gtid_mode parameter appears as gtid-mode.
+
+############################################################################################################
+##################To enable GTID-based replication for new read replicas####################################
+Make sure that the parameter group associated with the DB instance has the following parameter settings:
+
+gtid_mode – ON or ON_PERMISSIVE
+
+enforce_gtid_consistency – ON
+
+If you changed the parameter group of the DB instance, reboot the DB instance. 
+
+Create one or more read replicas of the DB instance.
+
+########################### GTID-based replication for existing read replicas ######################################
+
+For an existing MySQL DB instance with read replicas that doesn't use GTID-based repl ication, you can configure GTID-based replication
+between the DB instance and the read replicas.
+
+
