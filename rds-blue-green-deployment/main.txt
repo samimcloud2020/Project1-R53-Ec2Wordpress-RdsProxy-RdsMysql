@@ -45,7 +45,84 @@ Eliminate data loss during switchover.
 Switch over quickly, typically under a minute depending on your workload.
 
 ###########################################################################################################################
+Complete the following major steps when you use a blue/green deployment for database updates.
+-------------------------------------------------------------------------------------------------------------------------
+POINT1:-------------
+Identify a production environment that requires updates.
 
+For example, the production environment in this image has a Multi-AZ DB instance deployment (mydb1) and a read replica (mydb2).
+---------------------------------------------------------------------------------------------------------------------------
+POINT2:----------------
+Create the blue/green deployment. For instructions, see Creating a blue/green deployment.
+
+The following image shows an example of a blue/green deployment of the production environment from step 1. 
+
+While creating the blue/green deployment, RDS copies the complete topology and configuration of the primary DB instance-
+to create the green environment.
+
+The copied DB instance names are appended with -green-random-characters.
+
+The staging environment in the image contains a Multi-AZ DB instance deployment (mydb1-green-abc123) and a read replica (mydb2-green-abc123).
+
+
+When you create the blue/green deployment, you can upgrade your DB engine version and specify a different
+DB parameter group for the DB instances in the green environment.
+
+RDS also configures logical replication from the primary DB instance in the blue environment to the primary DB instance in the green environment.
+
+After you create the blue/green deployment, the DB instance in the green environment is read-only by default.  <--------
+---------------------------------------------------------------------------------------------------------------------------------
+POINT3:-------------
+Make additional changes to the staging environment, if required.
+
+For example, you might make schema changes to your database or change the DB instance class 
+used by one or more DB instances in the green environment.
+----------------------------------------------------------------------------------------------------------------------------------
+POINT-4:
+Test your staging environment.
+
+During testing, we recommend that you keep your databases in the green environment read only. 
+
+We recommend that you enable write operations on the green environment with caution 
+because they can result in replication conflicts.
+
+They can also result in unintended data in the production databases after switchover.
+---------------------------------------------------------------------------------------------------------------------------------
+POINT-5:----------
+When ready, switch over to promote the staging environment to be the new production environment.
+
+The switchover results in downtime. The downtime is usually under one minute, but it can be longer depending on your workload.
+
+---------------------------------------------------------------------------------------------------------------------------
+After the switchover, the DB instances that were in the green environment become the new production DB instances.
+
+The names and endpoints in the current production environment are assigned to the newly promoted production environment, 
+requiring no changes to your application.
+
+As a result, your production traffic now flows to the new production environment. 
+
+The DB instances in the previous blue environment are renamed by appending -oldn to the current name, 
+where n is a number.
+
+For example, assume the name of the DB instance in the blue environment is mydb1. 
+After switchover, the DB instance name might be mydb1-old1.
+
+In the example in the image, the following changes occur during switchover:
+
+The green environment Multi-AZ DB instance deployment named mydb1-green-abc123 becomes 
+the production Multi-AZ DB instance deployment named mydb1.
+
+The green environment read replica named mydb2-green-abc123 becomes the production read replica mydb2.
+
+The blue environment Multi-AZ DB instance deployment named mydb1 becomes mydb1-old1.
+
+The blue environment read replica named mydb2 becomes mydb2-old1.
+----------------------------------------------------------------------------------------------------------------------------
+POINT-6:---------
+If you no longer need a blue/green deployment, you can delete it.
+
+After switchover, the previous production environment isn't deleted so that you can use it for regression testing, if necessary.
+######################################################################################################################
 
 
 
