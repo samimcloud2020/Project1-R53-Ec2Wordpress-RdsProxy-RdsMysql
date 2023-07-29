@@ -1,4 +1,4 @@
-API G/W----->LAMBDA------->RDS PROXY--------->RDS  (all in vpc)
+CLIENT------API G/WREST-API)(REGIONAL)----->LAMBDA------->RDS PROXY--------->RDS--->REDIS/MEMCACHE CLUSTER----->MEMORY DB FOR REDIS  (all in vpc)
 
 
 rds----password auth
