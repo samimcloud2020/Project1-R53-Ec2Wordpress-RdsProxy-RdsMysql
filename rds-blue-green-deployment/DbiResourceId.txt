@@ -1,0 +1,19 @@
+Amazon RDS tracks resources in blue/green deployments with the DbiResourceId of each resource.
+
+This resource ID is an AWS Region-unique, immutable identifier for the resource.
+
+The resource ID is separate from the DB instance ID:
+--------------------------------------------------------------------------------------------------
+dbInstanceId   & ResourceId (DbiResourceId)  are different.
+
+
+The name (instance ID) of a resource changes when you switch over a blue/green deployment,
+but each resource keeps the same resource ID.
+
+EX:
+A DB instance identifier might be mydb in the blue environment.
+After switchover, the same DB instance might be renamed to mydb-old1. 
+However, the resource ID of the DB instance doesn't change during switchover. 
+
+So, when the green resources are promoted to be the new production resources, 
+their resource IDs don't match the blue resource IDs that were previously in production.
