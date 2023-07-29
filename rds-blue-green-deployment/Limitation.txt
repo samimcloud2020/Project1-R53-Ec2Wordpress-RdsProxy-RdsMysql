@@ -1,0 +1,39 @@
+#####################Limitations for blue/green deployments##########################################
+
+MySQL versions 8.0.11 through 8.0.13 have a community bug that prevents RDS from supporting them for blue/green deployments.
+
+The Event Scheduler (event_scheduler parameter) must be disabled on the green environment when you create a blue/green deployment.
+This prevents events from being generated in the green environment and causing inconsistencies.
+############################################################################################################
+Blue/green deployments aren't supported for the following features:
+
+Amazon RDS Proxy
+
+Cascading read replicas
+
+Cross-Region read replicas
+
+AWS CloudFormation
+
+Multi-AZ DB cluster deployments
+
+Blue/green deployments are supported for Multi-AZ DB instance deployments. 
+##############################################################################################################
+
+You can't change an unencrypted DB instance into an encrypted DB instance.
+
+You can't change an encrypted DB instance into an unencrypted DB instance.
+
+You can't change a blue environment DB instance to a higher engine version than
+its corresponding green environment DB instance.
+
+The resources in the blue environment and green environment must be in the same AWS account.
+
+During switchover, the blue primary DB instance can't be the target of external replication.
+
+If the source database is associated with a custom option group, you can't specify a major version upgrade 
+when you create the blue/green deployment.
+
+In this case, you can create a blue/green deployment without specifying a major version upgrade. 
+Then, you can upgrade the database in the green environment.
+###################################################################################################################
