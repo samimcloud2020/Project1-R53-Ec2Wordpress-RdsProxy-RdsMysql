@@ -1,0 +1,15 @@
+Deployment options:--------------
+The following deployment options are limited to those supported by the engine.
+  
+Multi-AZ DB Cluster - new
+     Creates a DB cluster with a primary DB instance and two readable standby DB instances, 
+     with each DB instance in a different Availability Zone (AZ).
+     Provides high availability, data redundancy and increases capacity to serve read workloads.
+  
+Multi-AZ DB instance
+    Creates a primary DB instance and a standby DB instance in a different AZ. 
+    Provides high availability and data redundancy, 
+    but the standby DB instance doesn't support connections for read workloads.
+Single DB instance
+    Creates a writer DB instance with no reader DB instances.
+##########################################################################################
