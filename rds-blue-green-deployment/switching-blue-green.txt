@@ -1,0 +1,128 @@
+A switchover promotes the green environment to be the new production environment.
+
+When the green DB instance has read replicas, they are also promoted. 
+
+            -------------BEFORE SWITCHOVER-------------------
+
+Before you switch over, production traffic is routed to the DB instance and read replicas in the blue environment.
+            -----------AFETR SWITCHOVER----------------------
+
+After you switch over, production traffic is routed to the DB instance and read replicas in the green environment.
+####################################Switchover timeout ############################################################################
+specify a switchover timeout period between 30 seconds and 3,600 seconds (one hour). 
+
+If the switchover takes longer than the specified duration, then any changes are rolled back and no changes are made to either environment. 
+
+The default timeout period is 300 seconds (five minutes). <-----------
+####################################################Switchover guardrails ######################################################
+When you start a switchover, Amazon RDS runs some basic checks to test the readiness of the blue and green environments for switchover. 
+
+These checks are known as switchover guardrails. 
+
+These switchover guardrails prevent a switchover if the environments aren't ready for it. 
+
+Therefore, they avoid longer than expected downtime and prevent the loss of data between the blue and green environments
+that might result if the switchover started.
+#############Amazon RDS runs the following guardrail checks on the green environment: ##################################
+Replication health –
+     Check if green primary DB instance replication status is healthy. 
+     The green primary DB instance is a replica of the blue primary DB instance.
+
+Replication lag – 
+    Check if the replica lag of the green primary DB instance is within allowable limits for switchover. 
+    The allowable limits are based on the specified timeout period.
+    Replica lag indicates how far the green primary DB instance is lagging behind its blue primary DB instance.
+    Replica lag indicates how much time the green replica might require before it catches up with its blue source.
+
+Active writes – 
+  Make sure there are no active writes on the green primary DB instance.
+##################Amazon RDS runs the following guardrail checks on the blue environment:###########################
+External replication – 
+    Make sure the blue primary DB instance isn't the target of external replication to prevent writes 
+    on the blue primary DB instance during switchover.
+
+Long-running active writes – 
+    Make sure there are no long-running active writes on the blue primary DB instance because they can increase replica lag.
+
+Long-running DDL statements – 
+    Make sure there are no long-running DDL statements on the blue primary DB instance because they can increase replica lag.
+
+################Switchover actions ##############################################################################
+##########When you switch over a blue/green deployment, RDS performs the following actions:##############################
+Runs guardrail checks to verify if the blue and green environments are ready for switchover.
+
+Stops new write operations on the primary DB instance in both environments.
+
+Drops connections to the DB instances in both environments and doesn't allow new connections.
+
+Waits for replication to catch up in the green environment so that the green environment is in sync with the blue environment.
+
+Renames the DB instances in the both environments.
+
+RDS renames the DB instances in the green environment to match the corresponding DB instances in the blue environment.
+    EX:
+    Assume the name of a DB instance in the blue environment is mydb. 
+    Also assume the name of the corresponding DB instance in the green environment is mydb-green-abc123. 
+    During switchover, the name of the DB instance in the green environment is changed to mydb.
+
+RDS renames the DB instances in the blue environment by appending -oldn to the current name, where n is a number. 
+    EX:
+    Assume the name of a DB instance in the blue environment is mydb. After switchover, the DB instance name might be mydb-old1.
+
+RDS also renames the endpoints in the green environment to match the corresponding endpoints in the blue environment 
+so that application changes aren't required.
+
+Allows connections to databases in both environments.
+
+Allows write operations on the primary DB instance in the new production environment.
+
+After switchover, the previous production primary DB instance only allows read operations until it is rebooted.
+
+You can monitor the status of a switchover using Amazon EventBridge. <--------
+
+If you have tags configured in the blue environment, these tags are moved to the new production environment during switchover. 
+The previous production environment also retains these tags.
+
+If the switchover starts and then stops before finishing for any reason, then any changes are rolled back,
+and no changes are made to either environment.
+########################Switchover best practices ###########################################################
+Thoroughly test the resources in the green environment. Make sure they function properly and efficiently.
+
+Monitor relevant Amazon CloudWatch metrics. 
+    ReplicaLag – 
+        Use this metric to identify the current replication lag on the green environment. 
+        To reduce downtime, make sure that this value is close to zero before you switch over.
+
+    DatabaseConnections – 
+        Use this metric to estimate the level of activity on the blue/green deployment, 
+        and make sure that the value is at an acceptable level for your deployment before you switch over. 
+        If Performance Insights is turned on, DBLoad is a more accurate metric.
+Identify the best time for the switchover.
+
+Make sure the DB instances in both environments are in Available state.
+
+Make sure the primary DB instance in the green environment is healthy and replicating.
+
+Make sure that your network and client configurations don’t increase the DNS cache Time-To-Live (TTL) beyond five seconds,
+which is the default for RDS DNS zones.
+Otherwise, applications will continue to send write traffic to the blue environment after  switchover.
+
+Make sure data loading is complete before switching over. 
+        Handling lazy loading when you create a blue/green deployment
+
+################################################################################################################################
+During a switchover, you can't modify any DB instances included in the switchover.
+
+###############################################################################################################################
+
+
+
+
+
+  
+
+
+
+
+
+
