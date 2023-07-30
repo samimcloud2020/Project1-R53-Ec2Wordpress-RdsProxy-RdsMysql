@@ -1,0 +1,83 @@
+/var/lib/mysql directory
+The MySQL database logs transactions to binary log files in the /var/lib/mysql directory.
+
+##################################################################################################################################
+In MySQL, the changes that occur within the database are logged simultaneously. 
+
+The MySQL BinLog (Binary Logs) is responsible for handling these updates and hence provide 
+a description of such events to indicate the changes made to the database being used. 
+
+These can be the changes made to the data or an operation like new table creation, etc.
+
+They even provide information on statements that could have lead to a potential change.
+
+The MySQL BinLogs serve two important purposes:
+
+Replication:
+    When working on a master server, the binary logs contain a record of the changes that have occurred.
+    These records are sent to the slave servers to help them execute those events & make the same data changes 
+    that were made on the master server. For more information on implementing replication, you can look into the replication manual.
+    
+Data Recovery: 
+    Some recovery operations require using binary logs. 
+    Once the backup is restored, the recorded events are re-executed and this brings the database up to date from the time of backup.
+##############################################################################################################################################
+Enabling A MySQL BinLog & Its Verification
+Enabling a MySQL BinLog is a must before being able to access the binary log. 
+This can be done using MySQL’s my.ini file.
+
+First, stop the currently running MySQL service using the following command:
+
+
+ # service mysqld stop
+Now make changes in the MySQL configuration files (/etc/my.cnf) and append the following lines of code in it:
+
+$vim .etc/my.cnf
+log-bin=mysql-bin
+expire_logs_days = 2
+binlog_format=mixed # Recommended binary logging format – mixed
+--------------------------------------------------------------------------------------------
+There’s another way to assign a value to the log-bin parameter:
+
+
+log-bin = /var/lib/mysql/<application-name>-mysql-bin.log
+Restart the service, to bring the changes into effect:
+
+
+# service mysqld start
+This is how you can enable a binary log in MySQL.
+#########################################################################################################################################################
+It always a good practice to verify whether the process to enable binary logs succeeded or not. This can be done using the following command:
+
+
+mysql> show variables like '%bin%';
+This code will result in an output similar to this:
+
+
++---------------------------------+----------------------+
+| Variable_name                   | Value                |
++---------------------------------+----------------------+
+| binlog_cache_size               | 38152                |
+| binlog_format                   | MIXED                |
+| innodb_locks_unsafe_for_binlog  | OFF                  |
+| log_bin                         | ON                   |
+| log_bin_trust_function_creators | OFF                  |
+| log_bin_trust_routine_creators  | OFF                  |
+| max_binlog_cache_size           | 18446744073709547520 |
+| max_binlog_size                 | 419430400            |
+| sql_log_bin                     | ON                   |
+| sync_binlog                     | 0                    |
++---------------------------------+----------------------+
+10 rows in set (0.00 sec)
+The parameter to check here is the log_bin. If the value of the log_bin is ON it indicates a successful process
+however, if it’s OFF you can turn it on as follows:
+
+
+mysql>SET GLOBAL log_bin = ON;
+Determining The Current BinLogs
+To retrieve a list of all the BinLogs present in your system, make use of the following command:
+
+
+mysql> SHOW BINARY LOGS;
+This command will display a list of all binary logs present in the system only when the binary log is enabled otherwise, it gives an error.
+#############################################################################################################
