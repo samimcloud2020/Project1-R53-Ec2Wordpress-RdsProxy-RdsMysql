@@ -125,8 +125,8 @@ app.py  my_virtual_env
 
 root@SDOP_Ts:~/my_function# source ./my_virtual_env/bin/activate
 (my_virtual_env) root@SDOP_Ts:~/my_function#
-(my_virtual_env) root@SDOP_Ts:~/my_function# pip install mysql-connector-python
-(my_virtual_env) root@SDOP_Ts:~/my_function# pip show mysql-connector-python
+(my_virtual_env) root@SDOP_Ts:~/my_function# pip3 install mysql-connector-python
+(my_virtual_env) root@SDOP_Ts:~/my_function# pip3 show mysql-connector-python
 Name: mysql-connector-python
 Version: 8.1.0
 Summary: MySQL driver written in Python
