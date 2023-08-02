@@ -64,6 +64,16 @@ test----->query string---->
 id="50"&Name="mesh"&Price="777"&ImageUrl="aaa.jpeg"
 
 
+-------------------------------------------------------------------------------
+{
+"id": $input.json('$'),
+"Name": $input.json('$'),
+"Price": $input.json('$'),
+"ImageUrl": $input.json('$')	
+}
 
+
+success but not worked
+----------------------------------------------------------------------------
 
  
