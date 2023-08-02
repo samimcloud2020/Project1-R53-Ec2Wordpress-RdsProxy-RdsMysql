@@ -1,0 +1,6 @@
+{
+"id": $input.params("id"),
+"Name": $input.params("Name"),
+"Price": $input.params("Price"),
+"ImageUrl": $input.params("ImageUrl"),
+}
