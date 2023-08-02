@@ -72,6 +72,11 @@ INSERT INTO products (Name,Price,ImageUrl) VALUES ("Laptop","100","c-1.png"),("D
 
 exit
 
+use ecomdb;
+CREATE TABLE products (id varchar(255),Name varchar(255) default NULL,Price varchar(255) default NULL, ImageUrl varchar(255) default NULL);
+INSERT INTO products (id,Name,Price,ImageUrl) VALUES ("1","Laptop","100","c-1.png"),("2","Drone","200","c-2.png"),("3","VR","300","c-3.png"),("4","Tablet","50","c-5.png"),("5","Watch","90","c-6.png"),("6","Phone Covers","20","c-7.png"),("7","Phone","80","c-8.png"),("8","Laptop","150","c-4.png");
+
+
 ----------------------install apache-------------------------------------------------
 sudo yum install -y httpd
 sudo service httpd start
