@@ -1,0 +1,4 @@
+pip3 install reindent
+reindent app.py
+or
+reindent -n app.py
