@@ -1,0 +1,69 @@
+api---->restapi--->regional
+
+resource : /
+method: POST
+
+method request: 
+    Authorization  none
+    Request Validator  none
+    API Key Required false
+ URL Query String Parameters :----
+Name	     Required 	       Caching	
+id			 
+ImageUrl			 
+Name			 
+Price		
+
+ Add query string
+
+ HTTP Request Headers
+
+ Request Body  
+
+ SDK Settings
+-----------------------------------------------------------------------------------------------
+Integration request:-------
+Integration type 
+---------------
+ Lambda Function 
+ HTTP 
+ Mock 
+ AWS Service 
+ VPC Link 
+
+Use Lambda Proxy integration   no
+ 
+Lambda Region us-east-1
+
+Lambda Function   rds3
+
+
+Mapping Templates 
+Request body passthrough:
+         When no template matches the request Content-Type header 
+         When there are no templates defined (recommended) 
+         Never 
+
+Content-Type	
+            application/json	
+
+ Add mapping template
+application/json
+
+Generate template: 
+
+{
+"id": "$input.params('id')",
+"Name": "$input.params('Name')",
+"Price": "$input.params('Price')",
+"ImageUrl": "$input.params('ImageUrl')"	
+}
+-----------------------------------------------------------------------------------
+test----->query string---->
+
+id="50"&Name="mesh"&Price="777"&ImageUrl="aaa.jpeg"
+
+
+
+
+ 
