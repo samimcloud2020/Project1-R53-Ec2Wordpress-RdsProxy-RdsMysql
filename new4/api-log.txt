@@ -1,0 +1,29 @@
+Execution log for request 7043a83e-4891-4ebb-b372-a53c423d9106
+Wed Aug 02 17:21:19 UTC 2023 : Starting execution for request: 7043a83e-4891-4ebb-b372-a53c423d9106
+Wed Aug 02 17:21:19 UTC 2023 : HTTP Method: POST, Resource Path: /
+Wed Aug 02 17:21:19 UTC 2023 : Method request path: {}
+Wed Aug 02 17:21:19 UTC 2023 : Method request query string: {Price=777, ImageUrl=aaa.jpeg, id=50, Name=mesh}
+Wed Aug 02 17:21:19 UTC 2023 : Method request headers: {}
+Wed Aug 02 17:21:19 UTC 2023 : Method request body before transformations: 
+Wed Aug 02 17:21:19 UTC 2023 : Endpoint request URI: https://lambda.us-east-1.amazonaws.com/2015-03-31/functions/arn:aws:lambda:us-east-1:291222035571:function:rds3/invocations
+Wed Aug 02 17:21:19 UTC 2023 : Endpoint request headers: {X-Amz-Date=20230802T172119Z, x-amzn-apigateway-api-id=th3ou257qi, Accept=application/json, User-Agent=AmazonAPIGateway_th3ou257qi, Host=lambda.us-east-1.amazonaws.com, X-Amz-Content-Sha256=ec105472201d5a04db6324c2cf830457ab5545dada5fd802e8ae9d1396401608, X-Amzn-Trace-Id=Root=1-64ca908f-afb75df037752388a2868ee1, x-amzn-lambda-integration-tag=7043a83e-4891-4ebb-b372-a53c423d9106, Authorization=*********************************************************************************************************************************************************************************************************************************************************************************************************************************************4cce1f, X-Amz-Source-Arn=arn:aws:execute-api:us-east-1:291222035571:th3ou257qi/test-invoke-stage/POST/, X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFkaCXVzLWVhc3QtMSJGMEQCIErwGak6PFM7f+KAL8P7cGPBWUrs7WFGwifpdMmdoHOsAiBZCUyzrA/1diPYRLXRrMxngAxHoHI1T2YOwwBN324YOSq7BQjx//////// [TRUNCATED]
+Wed Aug 02 17:21:19 UTC 2023 : Endpoint request body after transformations: {
+"id": "50",
+"Name": "mesh",
+"Price": "777",
+"ImageUrl": "aaa.jpeg"	
+}
+
+Wed Aug 02 17:21:19 UTC 2023 : Sending request to https://lambda.us-east-1.amazonaws.com/2015-03-31/functions/arn:aws:lambda:us-east-1:291222035571:function:rds3/invocations
+Wed Aug 02 17:21:19 UTC 2023 : Received response. Status: 200, Integration latency: 552 ms
+Wed Aug 02 17:21:19 UTC 2023 : Endpoint response headers: {Date=Wed, 02 Aug 2023 17:21:19 GMT, Content-Type=application/json, Content-Length=35, Connection=keep-alive, x-amzn-RequestId=d2068dd0-5297-4ba9-97f5-a7a0fbac778b, x-amzn-Remapped-Content-Length=0, X-Amz-Executed-Version=$LATEST, X-Amzn-Trace-Id=root=1-64ca908f-afb75df037752388a2868ee1;sampled=0;lineage=7619adf3:0}
+Wed Aug 02 17:21:19 UTC 2023 : Endpoint response body before transformations: "Added 12 items to RDS MySQL table"
+Wed Aug 02 17:21:19 UTC 2023 : Method response body after transformations: "Added 12 items to RDS MySQL table"
+Wed Aug 02 17:21:19 UTC 2023 : Method response headers: {X-Amzn-Trace-Id=Root=1-64ca908f-afb75df037752388a2868ee1;Sampled=0;lineage=7619adf3:0, Content-Type=application/json}
+Wed Aug 02 17:21:19 UTC 2023 : Successfully completed execution
+Wed Aug 02 17:21:19 UTC 2023 : Method completed with status: 200
+
+CloudShell
+Feedback
+Language
+© 2023, Amazon Web Services India Private Limited or its aff
