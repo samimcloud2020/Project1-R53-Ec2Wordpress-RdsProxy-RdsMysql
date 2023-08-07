@@ -102,8 +102,10 @@ pip3 install beautifulsoup4 -t ./package --no-user
 pip3 install pytz -t ./package --no-user
 
 cd package 
-wget numpy-1.24.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-wget pandas-2.0.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+cd package 
+wget https://mirrors.aliyun.com/pypi/packages/83/be/de078ac5e4ff572b1bdac1808b77cea2013b2c6286282f89b1de3e951273/numpy-1.24.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl#sha256=210461d87fb02a84ef243cac5e814aad2b7f4be953b32cb53327bb49fd77fbb4
+
+wget https://pypi.tuna.tsinghua.edu.cn/packages/9f/cc/cc8135de2a574fd87940b1d41c9c52d226d3ebc9fc8f6e9f18a7b0a81b57/pandas-2.0.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl#sha256=cf3f0c361a4270185baa89ec7ab92ecaa355fe783791457077473f974f654df5
 
 
 
