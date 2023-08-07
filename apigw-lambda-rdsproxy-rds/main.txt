@@ -97,6 +97,16 @@ def lambda_handler(event, context):
 ---------------------------------how to package   mysql-connector-python------------------------------------
 case1:---To create the deployment package (project directory)
 
+pip3 install requests==2.25.0 -t ./package --no-user 
+pip3 install beautifulsoup4 -t ./package --no-user 
+pip3 install pytz -t ./package --no-user
+
+cd package 
+wget numpy-1.24.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+wget pandas-2.0.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+
+
+
 $mkdir my-function
 $cd my-function
 $ls
