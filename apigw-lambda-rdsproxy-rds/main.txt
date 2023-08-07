@@ -103,6 +103,7 @@ $ls
 lambda_function.py
 $mkdir package
 $pip3 install --target ./package mysql-connector-python
+$pip3 install --target ./package requests==2.28.2
 $pip3 install --target ./package boto3
 $cd package
 $zip -r ../my_deployment_package.zip .
